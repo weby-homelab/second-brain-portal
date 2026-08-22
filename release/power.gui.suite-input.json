@@ -1,6 +1,6 @@
 {
   "schema": "power.gui.suite-input.v1",
-  "generated_at_utc": "2026-08-22T22:00:00Z",
+  "generated_at_utc": "2026-08-23T03:10:00Z",
   "power": {
     "version": "3.7.4",
     "tag": "v3.7.4",
@@ -13,10 +13,10 @@
     "python_range": ">=3.13,<3.15"
   },
   "gui": {
-    "version": "0.7.11"
+    "version": "0.7.12"
   },
   "constraints": {
     "filename": "release/power-suite.constraints.txt",
-    "sha256": "ec26ef4c3bb8c43e41fe07f7b448631fe694fb58fd972f425f02b7be53ddfa5f"
+    "sha256": "33977cd71397cf4f52399d4923c067bd7f0f9199eebbf7351adeb095a1f30456"
   }
 }

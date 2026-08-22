@@ -79,7 +79,7 @@ def test_dashboard_route_and_headers(client: TestClient) -> None:
     resp = client.get("/dashboard")
     assert resp.status_code == 200
     assert "P.O.W.E.R." in resp.text
-    assert "GUI v0.7.11" in resp.text
+    assert "GUI v0.7.12" in resp.text
     assert "3.7.4" in resp.text
     assert "01_Projects" in resp.text
     assert 'class="lang-switcher" role="group"' in resp.text

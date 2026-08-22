@@ -90,13 +90,21 @@ jobs:
       - name: Smoke-test the built wheel outside checkout
         run: |
           set -euo pipefail
+          expected="${GITHUB_REF_NAME#v}"
           smoke_dir="$RUNNER_TEMP/power-gui-wheel-smoke"
           python -m pip install --no-deps --target "$smoke_dir" dist/power_gui-*.whl
-          PYTHONPATH="$smoke_dir" python - <<'PY'
+          EXPECTED_VERSION="$expected" PYTHONPATH="$smoke_dir" python - <<'PY'
+          import os
           import power_gui
 
-          assert power_gui.__version__ == "0.7.10"
-          print("GUI wheel smoke passed")
+          expected = os.environ["EXPECTED_VERSION"]
+          assert power_gui.__version__ == expected, f"{power_gui.__version__} != {expected}"
+          # also verify release notes version matches tag
+          import pathlib
+
+          notes_path = pathlib.Path(f"release/release-{expected}.md")
+          assert notes_path.is_file(), f"release notes {notes_path} missing for tag {expected}"
+          print(f"GUI wheel smoke passed: {expected}")
           PY
 
       - name: Attest release artifacts
@@ -104,10 +112,23 @@ jobs:
         with:
           subject-path: "dist/*"
 
+      - name: Derive release metadata from tag
+        run: |
+          set -euo pipefail
+          expected="${GITHUB_REF_NAME#v}"
+          notes_path="release/release-${expected}.md"
+          test -f "$notes_path" || { echo "release notes $notes_path missing for tag $GITHUB_REF_NAME"; exit 1; }
+          # verify package version matches tag
+          pkg_version=$(python -c "import pathlib, re; print(re.search(r'version = \"([^\"]+)\"', pathlib.Path('pyproject.toml').read_text()).group(1))")
+          test "$pkg_version" = "$expected" || { echo "pyproject version $pkg_version != tag $expected"; exit 1; }
+          echo "EXPECTED_VERSION=$expected" >> "$GITHUB_ENV"
+          echo "RELEASE_NOTES_PATH=$notes_path" >> "$GITHUB_ENV"
+          echo "Derived $expected -> $notes_path verified"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3
         with:
-          body_path: release/release-0.7.10.md
+          body_path: ${{ env.RELEASE_NOTES_PATH }}
           generate_release_notes: false
           files: |
             dist/power_gui-*.whl
@@ -183,7 +204,10 @@ jobs:
           release = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
           assets_dir = pathlib.Path(sys.argv[2])
           receipt = json.loads((assets_dir / "power-gui.release-receipt.json").read_text(encoding="utf-8"))
-          notes = pathlib.Path("release/release-0.7.10.md").read_text(encoding="utf-8")
+          import os
+
+          expected = os.environ.get("EXPECTED_VERSION") or os.environ["GITHUB_REF_NAME"].lstrip("v")
+          notes = pathlib.Path(f"release/release-{expected}.md").read_text(encoding="utf-8")
           assert release["tagName"] == receipt["release"]["tag"]
           assert release["body"] == notes
           public_names = {asset["name"] for asset in release["assets"]}

@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).parents[2]
 POWER_SHA = "13dd835be5f5a03b13cad4a627b0445b2451acf0"
 POWER_WHEEL_SHA = "f12ad02097448cd1b7663fc79681481013637d011ecde25a9085a899beb547e2"
-CONSTRAINTS_SHA = "ec26ef4c3bb8c43e41fe07f7b448631fe694fb58fd972f425f02b7be53ddfa5f"
+CONSTRAINTS_SHA = "33977cd71397cf4f52399d4923c067bd7f0f9199eebbf7351adeb095a1f30456"
 
 
 def test_native_service_is_user_scoped_loopback_and_opt_in() -> None:
@@ -49,7 +49,7 @@ def test_compatibility_manifest_does_not_claim_unpublished_digest() -> None:
     assert manifest["power_core"]["dependency"]["tag"] == "v3.7.4"
     assert manifest["power_core"]["dependency"]["wheel_sha256"] == POWER_WHEEL_SHA
     assert manifest["power_core"]["candidate_publication_required"] is False
-    assert manifest["power_gui"]["version"] == "0.7.11"
+    assert manifest["power_gui"]["version"] == "0.7.12"
     assert manifest["power_gui"]["release_tag"] is None
     assert manifest["container"]["digest"] is None
     assert manifest["container"]["digest_status"] == "not_published"
@@ -60,7 +60,7 @@ def test_compatibility_manifest_does_not_claim_unpublished_digest() -> None:
     assert suite_input["schema"] == "power.gui.suite-input.v1"
     assert suite_input["power"]["source_sha"] == POWER_SHA
     assert suite_input["power"]["wheel_sha256"] == POWER_WHEEL_SHA
-    assert suite_input["gui"]["version"] == "0.7.11"
+    assert suite_input["gui"]["version"] == "0.7.12"
     assert suite_input["constraints"]["sha256"] == CONSTRAINTS_SHA
     assert POWER_SHA not in ("eb8afbfdc9f067e7b11b8679390e1327a9becf6c", "main", "latest")
 
