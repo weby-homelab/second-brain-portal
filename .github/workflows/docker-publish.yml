@@ -53,10 +53,15 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade "pip>=26.2"
-          pip install "https://github.com/weby-homelab/power-framework/releases/download/v3.7.4/power_framework-3.7.4-py3-none-any.whl"
+          pip download --no-deps --dest /tmp/wheels "power-framework @ https://github.com/weby-homelab/power-framework/releases/download/v3.7.4/power_framework-3.7.4-py3-none-any.whl"
+          echo "f12ad02097448cd1b7663fc79681481013637d011ecde25a9085a899beb547e2  /tmp/wheels/power_framework-3.7.4-py3-none-any.whl" | sha256sum -c -
+          pip install --no-cache-dir "/tmp/wheels/power_framework-3.7.4-py3-none-any.whl"
           python -c "import importlib.metadata; assert importlib.metadata.version('power-framework') == '3.7.4'"
-          echo "f12ad02097448cd1b7663fc79681481013637d011ecde25a9085a899beb547e2  $(python -c 'import importlib.metadata, pathlib; print(pathlib.Path(importlib.metadata.distribution(\"power-framework\").locator) if False else \"\")')" | head -1
           pip install -e ".[dev]"
+
+      - name: Validate suite-input drift (mandatory)
+        run: |
+          python scripts/validate_suite_input.py
 
       - name: Run Ruff Lint
         run: ruff check src tests
@@ -123,6 +128,7 @@ jobs:
           build-args: |
             POWER_FRAMEWORK_COMMIT=13dd835be5f5a03b13cad4a627b0445b2451acf0
             POWER_FRAMEWORK_WHEEL_SHA256=f12ad02097448cd1b7663fc79681481013637d011ecde25a9085a899beb547e2
+            SUITE_CONSTRAINTS_SHA256=33977cd71397cf4f52399d4923c067bd7f0f9199eebbf7351adeb095a1f30456
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

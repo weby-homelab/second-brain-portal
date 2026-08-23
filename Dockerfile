@@ -11,16 +11,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Install the exact suite-reviewed dependency set with semantic dense embeddings.
+# Install the exact suite-reviewed dependency set with semantic+rerank dense embeddings.
 # Stable container must verify exact final public POWER wheel hash before installation.
 COPY release/power-suite.constraints.txt /app/power-suite.constraints.txt
 RUN test "$(sha256sum /app/power-suite.constraints.txt | awk '{print $1}')" = "$SUITE_CONSTRAINTS_SHA256" && \
-    pip download --no-deps --dest /tmp/wheels "power-framework[semantic] @ https://github.com/weby-homelab/power-framework/releases/download/v3.7.4/power_framework-3.7.4-py3-none-any.whl" && \
+    pip download --no-deps --dest /tmp/wheels "power-framework[semantic,rerank] @ https://github.com/weby-homelab/power-framework/releases/download/v3.7.4/power_framework-3.7.4-py3-none-any.whl" && \
     echo "${POWER_FRAMEWORK_WHEEL_SHA256}  /tmp/wheels/power_framework-3.7.4-py3-none-any.whl" | sha256sum -c - && \
-    pip install --no-cache-dir --constraint /app/power-suite.constraints.txt "/tmp/wheels/power_framework-3.7.4-py3-none-any.whl[semantic]" && \
+    pip install --no-cache-dir --constraint /app/power-suite.constraints.txt "/tmp/wheels/power_framework-3.7.4-py3-none-any.whl[semantic,rerank]" && \
     rm -rf /tmp/wheels && \
     test "$(python3 -c 'import importlib.metadata; print(importlib.metadata.version("power-framework"))')" = "3.7.4" && \
-    python3 -c "import importlib.util; assert importlib.util.find_spec('onnxruntime') is not None, 'semantic deps missing: onnxruntime'; assert importlib.util.find_spec('fastembed') is not None"
+    python3 -c "import importlib.util; assert importlib.util.find_spec('onnxruntime') is not None, 'semantic deps missing: onnxruntime'; assert importlib.util.find_spec('tokenizers') is not None, 'semantic deps missing: tokenizers'; assert importlib.util.find_spec('huggingface_hub') is not None, 'semantic deps missing: huggingface_hub'; assert importlib.util.find_spec('numpy') is not None, 'semantic deps missing: numpy'; assert importlib.util.find_spec('fastembed') is not None, 'rerank deps missing: fastembed'"
 
 COPY pyproject.toml .
 COPY src/ ./src/
