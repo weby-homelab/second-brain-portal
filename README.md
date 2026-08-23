@@ -16,7 +16,7 @@
 
 **P.O.W.E.R-GUI** is a security-focused, AI-native web cockpit and decision center for your personal [Obsidian](https://obsidian.md) knowledge base (Second Brain). Designed as a **Docker-First** candidate with a documented native profile, it bridges human operators and autonomous AI agents through the **P.O.W.E.R Framework (P.A.R.A. + OKF v0.1 + Graph RAG + LLM-Wiki)**.
 
-**Suite candidate:** GUI `0.7.11` against POWER `3.7.4` at immutable final public tag `v3.7.4` commit `13dd835be5f5a03b13cad4a627b0445b2451acf0` wheel `f12ad02097448cd1b7663fc79681481013637d011ecde25a9085a899beb547e2` and the `power.application.v2` contract (Python `>=3.13,<3.15`). This worktree is a candidate: signed tags, container digest, SBOM/provenance, publication and live E2E readback remain explicit release gates in [`compatibility.json`](compatibility.json). The public discovery surface remains experimental custom discovery; stable A2A and multi-writer Federation are not supported claims.
+**Suite candidate:** GUI `0.7.12` candidate against POWER `3.7.4` at immutable final public tag `v3.7.4` commit `13dd835be5f5a03b13cad4a627b0445b2451acf0` wheel `f12ad02097448cd1b7663fc79681481013637d011ecde25a9085a899beb547e2` and the `power.application.v2` contract (Python `>=3.13,<3.15`). This worktree is a candidate: GUI `0.7.12` candidate, `POWER 3.7.4` exact pair, publication pending, Suite certification pending — do not claim Stable. Signed tags, container digest, SBOM/provenance, publication and live E2E readback remain explicit release gates in [`compatibility.json`](compatibility.json). The public discovery surface remains experimental custom discovery; stable A2A and multi-writer Federation are not supported claims.
 
 ---
 
@@ -173,7 +173,7 @@ docker run -d \
   -e POWER_GUI_SECRET_KEY="${POWER_GUI_SECRET_KEY}" \
   -e POWER_GUI_COOKIE_SECURE=true \
   -v /path/to/your/obsidian/brain:/brain:rw \
-  webyhomelab/power-gui:0.7.10
+  webyhomelab/power-gui:0.7.12
 ```
 
 
@@ -188,7 +188,7 @@ Create a `docker-compose.yml` file:
 ```yaml
 services:
   power-gui:
-    image: webyhomelab/power-gui:0.7.10
+    image: webyhomelab/power-gui:0.7.12
     container_name: power-gui
     restart: unless-stopped
     init: true
@@ -268,7 +268,7 @@ Set `POWER_GUI_BIND_ADDRESS` to the LXC interface reachable by a host-level reve
      -e POWER_GUI_COOKIE_SECURE=true \
      -v /mnt/brain:/brain:rw \
      -v power_cache:/data \
-      webyhomelab/power-gui:0.7.10
+      webyhomelab/power-gui:0.7.12
    ```
 
 ---
@@ -412,7 +412,7 @@ description: Production-grade AI-native web cockpit and decision center for Obsi
 applicationCategory: WebApplication
 applicationSubCategory: KnowledgeManagement
 operatingSystem: Linux
-softwareVersion: 0.7.10
+softwareVersion: 0.7.12
 keywords: second-brain, obsidian, power-framework, fastapi, web-ui, knowledge-graph, ai-cockpit
 author: Weby Homelab (https://github.com/weby-homelab)
 codeRepository: https://github.com/weby-homelab/ai-second-brain-gui

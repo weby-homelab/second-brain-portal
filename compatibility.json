@@ -5,7 +5,7 @@
     "candidate_version": "3.7.4",
     "package_version_at_public_revision": "3.7.4",
     "schema_version": "power.application.v2",
-    "version_strategy": "Exact-pair binding: GUI 0.7.12 binds immutable final public POWER 3.7.4 tag v3.7.4 commit 13dd835 and wheel f12ad02. Fix: Dockerfile installs wheel with [semantic] extra and workflow is version-agnostic.",
+    "version_strategy": "Exact-pair binding: GUI 0.7.12 binds immutable final public POWER 3.7.4 tag v3.7.4 commit 13dd835 and wheel f12ad02. Fix: Dockerfile installs wheel with [semantic,rerank] extra and workflow is version-agnostic.",
     "dependency": {
       "strategy": "exact-public-wheel",
       "repository": "https://github.com/weby-homelab/power-framework",
@@ -16,24 +16,25 @@
       "wheel_filename": "power_framework-3.7.4-py3-none-any.whl",
       "wheel_sha256": "f12ad02097448cd1b7663fc79681481013637d011ecde25a9085a899beb547e2"
     },
-    "candidate_revision": "13dd835be5f5a03b13cad4a627b0445b2451acf0",
+    "candidate_revision": null,
     "candidate_publication_required": false,
     "source_inventory": [
       "source.list",
       "source.stats",
       "source.read",
       "source.graph"
-    ]
+    ],
+    "candidate_revision_ref": "resolved from signed POWER release tag v3.7.4 at publication"
   },
   "power_gui": {
     "name": "power-gui",
     "version": "0.7.12",
     "base_revision": "260db22e05a6652e4846fd469aad9d2dd3732131",
     "base_revision_ref": "public v0.7.11 signed release (260db22) - superseded, remains published but not certified",
-    "candidate_revision": "13dd835be5f5a03b13cad4a627b0445b2451acf0",
-    "candidate_revision_ref": "POWER 3.7.4 exact-pair forensic corrective patch 0.7.12; exact final POWER wheel f12ad02 binding + semantic fix + workflow fix",
+    "candidate_revision": null,
+    "candidate_revision_ref": "resolved from signed GUI release tag at publication",
     "release_tag": null,
-    "revision_strategy": "Candidate binds exact final POWER wheel hash; tag published only after P14 GO."
+    "revision_strategy": "Candidate binds exact final POWER wheel hash; tag published only after GO."
   },
   "runtime": {
     "python": ">=3.13,<3.15",
@@ -75,7 +76,7 @@
   },
   "verification": {
     "local_candidate_core": "POWER 3.7.4 immutable final public tag v3.7.4 commit 13dd835 wheel f12ad02 verified",
-    "local_candidate_gui": "GUI 0.7.11 corrective patch binds exact final POWER wheel; signed commit, tag, and image digest readback remain release gates",
-    "clean_install_pair": "Exact-pair 3.7.4/0.7.11 requires exact wheel hashes, native matrix, container digest, and public readback before Suite Stable"
+    "local_candidate_gui": "GUI 0.7.12 corrective patch binds exact final POWER wheel; signed commit, tag, and image digest readback remain release gates",
+    "clean_install_pair": "Exact-pair 3.7.4/0.7.12 requires exact wheel hashes, native matrix, container digest, and public readback before Suite Stable"
   }
 }

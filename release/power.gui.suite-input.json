@@ -1,6 +1,5 @@
 {
   "schema": "power.gui.suite-input.v1",
-  "generated_at_utc": "2026-08-23T03:10:00Z",
   "power": {
     "version": "3.7.4",
     "tag": "v3.7.4",
