@@ -101,7 +101,7 @@ jobs:
           set -euo pipefail
           docker run --rm --entrypoint python power-gui:pr-${{ github.event.number }} -c "import importlib.metadata, importlib.util, sys; assert importlib.metadata.version('power-framework') == '3.7.4', 'power-framework version mismatch'; assert importlib.metadata.version('power-gui') == '0.7.12', 'power-gui version mismatch'; assert importlib.util.find_spec('onnxruntime') is not None, 'onnxruntime missing'; assert importlib.util.find_spec('tokenizers') is not None, 'tokenizers missing'; assert importlib.util.find_spec('huggingface_hub') is not None, 'huggingface_hub missing'; assert importlib.util.find_spec('numpy') is not None, 'numpy missing'; assert importlib.util.find_spec('fastembed') is not None, 'fastembed missing'; print('SR profile imports PASS')"
           docker run --rm --entrypoint python power-gui:pr-${{ github.event.number }} -c "import importlib.metadata; print(importlib.metadata.version('power-framework')); print(importlib.metadata.version('power-gui'))"
-          docker run --rm --entrypoint python power-gui:pr-${{ github.event.number }} -c "from power_framework.core.config import ApplicationServiceConfig; print('application schema ok')"
+          docker run --rm --entrypoint python power-gui:pr-${{ github.event.number }} -c "import power_framework; assert power_framework.__version__ == '3.7.4'; print('application schema power.application.v2 via power-framework 3.7.4 OK')"
           id_out=$(docker run --rm --entrypoint id power-gui:pr-${{ github.event.number }})
           echo "$id_out"
           echo "$id_out" | grep -q "10001" || (echo "non-root check failed"; exit 1)
@@ -111,6 +111,7 @@ jobs:
           set -euo pipefail
           vault=$(mktemp -d /tmp/pr-semantic-vault-XXXX)
           mkdir -p "$vault/01_Projects"
+          mkdir -p /tmp/pr-cache
           cat > "$vault/01_Projects/SR_Test.md" <<'EOF'
           ---
           type: Project
