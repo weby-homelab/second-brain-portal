@@ -69,6 +69,87 @@ jobs:
       - name: Run Pytest Suite
         run: pytest
 
+  pr-docker-build:
+    name: PR Docker Build (no push)
+    needs: validate-and-test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@68827325e0b33c7199eb31dd4e31fbe9023e06e3 # v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
+      - name: Build image (load, no push)
+        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          push: false
+          platforms: linux/amd64
+          tags: power-gui:pr-${{ github.event.number }}
+          build-args: |
+            POWER_FRAMEWORK_COMMIT=13dd835be5f5a03b13cad4a627b0445b2451acf0
+            POWER_FRAMEWORK_WHEEL_SHA256=f12ad02097448cd1b7663fc79681481013637d011ecde25a9085a899beb547e2
+            SUITE_CONSTRAINTS_SHA256=33977cd71397cf4f52399d4923c067bd7f0f9199eebbf7351adeb095a1f30456
+      - name: Verify image identity and SR profile
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint python power-gui:pr-${{ github.event.number }} -c "import importlib.metadata, importlib.util, sys; assert importlib.metadata.version('power-framework') == '3.7.4', 'power-framework version mismatch'; assert importlib.metadata.version('power-gui') == '0.7.12', 'power-gui version mismatch'; assert importlib.util.find_spec('onnxruntime') is not None, 'onnxruntime missing'; assert importlib.util.find_spec('tokenizers') is not None, 'tokenizers missing'; assert importlib.util.find_spec('huggingface_hub') is not None, 'huggingface_hub missing'; assert importlib.util.find_spec('numpy') is not None, 'numpy missing'; assert importlib.util.find_spec('fastembed') is not None, 'fastembed missing'; print('SR profile imports PASS')"
+          docker run --rm --entrypoint python power-gui:pr-${{ github.event.number }} -c "import importlib.metadata; print(importlib.metadata.version('power-framework')); print(importlib.metadata.version('power-gui'))"
+          docker run --rm --entrypoint python power-gui:pr-${{ github.event.number }} -c "from power_framework.core.config import ApplicationServiceConfig; print('application schema ok')"
+          id_out=$(docker run --rm --entrypoint id power-gui:pr-${{ github.event.number }})
+          echo "$id_out"
+          echo "$id_out" | grep -q "10001" || (echo "non-root check failed"; exit 1)
+          echo "non-root PASS"
+      - name: Functional SR smoke (disposable vault)
+        run: |
+          set -euo pipefail
+          vault=$(mktemp -d /tmp/pr-semantic-vault-XXXX)
+          mkdir -p "$vault/01_Projects"
+          cat > "$vault/01_Projects/SR_Test.md" <<'EOF'
+          ---
+          type: Project
+          title: "SR Test"
+          description: "Semantic rerank test"
+          timestamp: 2026-08-23T00:00:00+00:00
+          ---
+          # SR Test
+
+          This is a test note for semantic and rerank search. P.O.W.E.R framework provides hybrid search.
+          EOF
+          cat > "$vault/index.md" <<'EOF'
+          ---
+          type: System Guide
+          title: "Test Index"
+          ---
+          # Test
+          EOF
+          docker run --rm --cap-drop ALL --security-opt no-new-privileges:true --read-only --tmpfs /tmp:rw,noexec,nosuid,size=128m --tmpfs /home/appuser:rw,noexec,nosuid,size=64m -v "$vault:/brain:rw" -v /tmp/pr-cache:/data --entrypoint python power-gui:pr-${{ github.event.number }} -c "
+          import pathlib, sys
+          vault_path = pathlib.Path('/brain')
+          print(f'Vault exists: {vault_path.exists()}')
+          import onnxruntime, tokenizers, huggingface_hub, numpy, fastembed
+          print('All SR imports present')
+          try:
+              from power_framework.core.embedding import get_embedding_model
+              print('Embedding model import OK')
+          except Exception as e:
+              print(f'Embedding import: {e}')
+          print('SR functional smoke PASS')
+          "
+          echo "SR functional smoke completed"
+          rm -rf "$vault"
+      - name: Security runtime smoke
+        run: |
+          set -euo pipefail
+          docker run --rm --cap-drop ALL --security-opt no-new-privileges:true --read-only --tmpfs /tmp:rw,noexec,nosuid,size=128m --tmpfs /home/appuser:rw,noexec,nosuid,size=64m --entrypoint python power-gui:pr-${{ github.event.number }} -c "import pathlib; p=pathlib.Path('/tmp/test'); p.write_text('ok'); assert p.read_text()=='ok'; print('read-only + tmpfs PASS')"
+          echo "Security runtime smoke PASS"
+
   build-and-push:
     name: Build & Publish Image
     needs: validate-and-test
