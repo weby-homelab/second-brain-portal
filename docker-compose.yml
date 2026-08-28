@@ -1,6 +1,6 @@
 services:
   power-gui:
-    image: webyhomelab/power-gui:0.7.10
+    image: webyhomelab/power-gui:0.7.12
     build:
       context: .
       dockerfile: Dockerfile

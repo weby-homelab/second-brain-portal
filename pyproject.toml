@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "power-gui"
-version = "0.7.11"
+version = "0.7.12"
 description = "Secure, accessible, local-first web cockpit and decision center for P.O.W.E.R."
 readme = "README.md"
 requires-python = ">=3.13,<3.15"
